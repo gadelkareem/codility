@@ -14,7 +14,52 @@ func main() {
 	//fmt.Printf("%+v\n", BinaryGap(1041))
 	//fmt.Printf("%+v\n", OddOccurrencesInArray([]int{2, 2, 3, 3, 4}))
 	//fmt.Printf("%+v\n", PermCheck([]int{4, 1, 2, 3}))
-	fmt.Printf("%+v\n", FrogRiverOne(5, []int{1, 3, 1, 4, 2, 3, 5, 4}))
+	//fmt.Printf("%+v\n", FrogRiverOne(5, []int{1, 3, 1, 4, 2, 3, 5, 4}))
+	//fmt.Printf("%+v\n", MaxCounters(5, []int{3, 4, 4, 6, 1, 4, 4}))
+	fmt.Printf("%+v\n", MissingInteger([]int{1, 3, 6, 4, 1, 2}))
+}
+
+// https://app.codility.com/demo/results/trainingEARXAJ-4P7/
+func MissingInteger(A []int) int {
+	r := make(map[int]bool)
+	for _, i := range A {
+		if i > 0 {
+			r[i] = true
+		}
+	}
+	x := 1
+	for ; x < len(r)+1; x++ {
+		if _, ok := r[x]; !ok {
+			return x
+		}
+	}
+	return x
+}
+
+// https://app.codility.com/demo/results/training74S4ZC-NWJ/
+func MaxCounters(N int, A []int) []int {
+	var X, maxCounter, currentMax int
+	r := make([]int, N)
+	for i := 0; i < len(A); i++ {
+		X = A[i]
+		if X >= 1 && X <= N {
+			if r[X-1] < maxCounter {
+				r[X-1] = maxCounter
+			}
+			r[X-1]++
+			if r[X-1] > currentMax {
+				currentMax = r[X-1]
+			}
+		} else if X == N+1 {
+			maxCounter = currentMax
+		}
+	}
+	for j := 0; j < N; j++ {
+		if r[j] < maxCounter {
+			r[j] = maxCounter
+		}
+	}
+	return r
 }
 
 // https://app.codility.com/demo/results/training8TSYUJ-JVJ/
