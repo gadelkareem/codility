@@ -1,3 +1,1 @@
-# Zakiedra
-
 # codility
