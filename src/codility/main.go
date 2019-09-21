@@ -141,7 +141,7 @@ func CyclicRotation(A []int, K int) []int {
 	return A
 }
 
-//  https://github.com/theodesp/codility-go/blob/master/max-slice/MaxDoubleSliceSum.go
+//
 func MaxDoubleSliceSum(A []int) int {
 	maxSliceSum := 0
 	N := len(A) - 1
