@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"sort"
+	"strings"
 )
 
 func main() {
@@ -23,7 +24,35 @@ func main() {
 	//fmt.Printf("%+v\n", MaxProductOfThree([]int{-3, 1, 2, -2, 5, 6}))
 	//fmt.Printf("%+v\n", Distinct([]int{2, 1, 1, 2, 3, 1}))
 	//fmt.Printf("%+v\n", Triangle([]int{50, 40, 20, 10, 1}))
-	fmt.Printf("%+v\n", NumberOfDiscIntersections([]int{1, 5, 2, 1, 4, 0}))
+	//fmt.Printf("%+v\n", NumberOfDiscIntersections([]int{1, 5, 2, 1, 4, 0}))
+	fmt.Printf("%+v\n", Brackets("([)()]"))
+}
+
+// https://app.codility.com/demo/results/trainingUUMP9F-8JU/
+func Brackets(S string) int {
+	if S == "" {
+		return 1
+	}
+	o := "{[("
+	c := "}])"
+	var h []string
+	m := map[string]string{"[": "]", "{": "}", "(": ")"}
+	for i := 0; i < len(S); i++ {
+		N := len(h)
+		chr := string(S[i])
+		if strings.Contains(o, chr) {
+			h = append(h, chr)
+		} else if strings.Contains(c, chr) {
+			if N == 0 || chr != m[h[N-1]] {
+				return 0
+			}
+			h = h[:N-1]
+		}
+	}
+	if len(h) == 0 {
+		return 1
+	}
+	return 0
 }
 
 // https://app.codility.com/demo/results/trainingJZ8UZK-4ET/
