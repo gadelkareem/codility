@@ -25,7 +25,51 @@ func main() {
 	//fmt.Printf("%+v\n", Distinct([]int{2, 1, 1, 2, 3, 1}))
 	//fmt.Printf("%+v\n", Triangle([]int{50, 40, 20, 10, 1}))
 	//fmt.Printf("%+v\n", NumberOfDiscIntersections([]int{1, 5, 2, 1, 4, 0}))
-	fmt.Printf("%+v\n", Brackets("([)()]"))
+	//fmt.Printf("%+v\n", Brackets("([)()]"))
+	//fmt.Printf("%+v\n", Nesting("())"))
+	fmt.Printf("%+v\n", Dominator([]int{3, 4, 3, 2, 3, -1, 3, 3}))
+}
+
+// https://app.codility.com/demo/results/training3666ES-AR2/
+func Dominator(A []int) int {
+	halfLn := int(math.Ceil(float64(len(A) / 2)))
+	h := make(map[int][]int)
+	for i, n := range A {
+		h[n] = append(h[n], i)
+	}
+	for _, r := range h {
+		if len(r) > halfLn {
+			return r[0]
+		}
+	}
+	return -1
+}
+
+// https://app.codility.com/demo/results/training2XGHZ9-CHS/
+func Nesting(S string) int {
+	if S == "" {
+		return 1
+	}
+	o := "("
+	c := ")"
+	var h []string
+	m := map[string]string{"(": ")"}
+	for i := 0; i < len(S); i++ {
+		N := len(h)
+		chr := string(S[i])
+		if chr == o {
+			h = append(h, chr)
+		} else if chr == c {
+			if N == 0 || chr != m[h[N-1]] {
+				return 0
+			}
+			h = h[:N-1]
+		}
+	}
+	if len(h) == 0 {
+		return 1
+	}
+	return 0
 }
 
 // https://app.codility.com/demo/results/trainingUUMP9F-8JU/
