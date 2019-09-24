@@ -1,10 +1,14 @@
 package main
 
 import (
+	"encoding/csv"
 	"fmt"
+	"log"
 	"math"
+	"path/filepath"
 	"sort"
 	"strings"
+	"time"
 )
 
 func main() {
@@ -27,7 +31,108 @@ func main() {
 	//fmt.Printf("%+v\n", NumberOfDiscIntersections([]int{1, 5, 2, 1, 4, 0}))
 	//fmt.Printf("%+v\n", Brackets("([)()]"))
 	//fmt.Printf("%+v\n", Nesting("())"))
-	fmt.Printf("%+v\n", Dominator([]int{3, 4, 3, 2, 3, -1, 3, 3}))
+	//fmt.Printf("%+v\n", Dominator([]int{3, 4, 3, 2, 3, -1, 3, 3}))
+	fmt.Printf("%+v\n", Solution([]int{9, 1, 4, 9, 0, 4, 8, 9, 0, 1}))
+}
+
+func Solution(T []int) []int {
+	l := -1
+	h := make(map[int][]int)
+	for i, n := range T {
+		if n == i {
+			l = i
+		} else {
+			h[n] = append(h[n], i)
+		}
+	}
+	var counts []int
+	done := false
+	for range T {
+		if _, ok := h[l]; !ok || len(h[l]) == 0 {
+			break
+		}
+		j := len(h[l])
+		if done {
+			j = 0
+		}
+		counts = append(counts, j)
+		done = true
+		for _, x := range h[l] {
+			if _, ok := h[x]; ok && x != l {
+				h[l] = nil
+				l = x
+				done = false
+				break
+			}
+		}
+	}
+
+	return counts
+}
+
+var t = `photo.jpg, Warsaw, 2013-09-05 14:08:15
+john.png, London, 2015-06-20 15:13:22
+myFriends.png, Warsaw, 2013-09-05 14:07:13
+Eiffel.jpg, Paris, 2015-07-23 08:03:02
+pisatower.jpg, Paris, 2015-07-22 23:59:59
+BOB.jpg, London, 2015-08-05 00:02:03
+notredame.png, Paris, 2015-09-01 12:00:00
+me.jpg, Warsaw, 2013-09-06 15:40:22
+a.png, Warsaw, 2016-02-13 13:33:50
+b.jpg, Warsaw, 2016-01-02 15:12:22
+c.jpg, Warsaw, 2016-01-02 14:34:30
+d.jpg, Warsaw, 2016-01-02 15:15:01
+e.png, Warsaw, 2016-01-02 09:49:09
+f.png, Warsaw, 2016-01-02 10:55:32
+g.jpg, Warsaw, 2016-02-29 22:13:11`
+
+func sol(S string) string {
+	r := csv.NewReader(strings.NewReader(S))
+	// Read all records.
+	lines, _ := r.ReadAll()
+	//count locations
+	loc := make(map[string]map[float64]int)
+	dates := make([]float64, len(lines))
+	for i, l := range lines {
+		//count locations
+		c := strings.TrimSpace(l[1])
+		if _, ok := loc[c]; !ok {
+			loc[c] = make(map[float64]int)
+		}
+		t, err := time.Parse("2006-01-02 15:04:05", strings.TrimSpace(l[2]))
+		if err != nil {
+			log.Fatal(err)
+			continue
+		}
+		tu := t.Unix()
+		loc[c][float64(tu)] = i
+		dates = append(dates, float64(tu))
+	}
+	//sort dates
+	sort.Float64s(dates)
+	//generate names
+	names := make([]string, len(lines))
+	for c, n := range loc {
+		ln := len(n)
+		format := "%s%0d"
+		numOfZ := len(fmt.Sprintf("%d", ln))
+		if numOfZ > 1 {
+			format = "%s%0" + fmt.Sprintf("%d", numOfZ) + "d"
+		}
+		j := 1
+		for _, tu := range dates {
+			if _, ok := n[tu]; !ok {
+				continue
+			}
+			names[n[tu]] = fmt.Sprintf(format, c, j)
+			j++
+		}
+	}
+	var list []string
+	for i, l := range lines {
+		list = append(list, fmt.Sprintf("%s%s", names[i], filepath.Ext(l[0])))
+	}
+	return strings.Join(list, "\n")
 }
 
 // https://app.codility.com/demo/results/training3666ES-AR2/
