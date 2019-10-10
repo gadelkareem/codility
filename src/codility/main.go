@@ -32,7 +32,8 @@ func main() {
 	//fmt.Printf("%+v\n", Brackets("([)()]"))
 	//fmt.Printf("%+v\n", Nesting("())"))
 	//fmt.Printf("%+v\n", Dominator([]int{3, 4, 3, 2, 3, -1, 3, 3}))
-	fmt.Printf("%+v\n", Solution([]int{9, 1, 4, 9, 0, 4, 8, 9, 0, 1}))
+	//fmt.Printf("%+v\n", Solution([]int{9, 1, 4, 9, 0, 4, 8, 9, 0, 1}))
+	fmt.Printf("%+v\n", f([]string{"a", "z", "c", "t", "v", "a"}, "cat"))
 }
 
 func Solution(T []int) []int {
@@ -544,4 +545,105 @@ func sum(A []int, x, y, z int) int {
 func minInSlice(v []int) int {
 	sort.Ints(v)
 	return v[0]
+}
+
+/*
+
+example word:  "cat"
+board:  [ 'a', 'z', 'c', 't', 'v', 'a' ]
+
+best order (move and the state of the board after the move):
+
+starting board: [ 'a', 'z', 'c', 't', 'v', 'a' ]
+
+MOVE:         RESULTING BOARD (after the move):
+
+seeking "c" (closer to the left, so take from the left) [ 'a', 'z', 'c', 't', 'v', 'a' ]
+
+LEFT       => [ 'z', 'c', 't', 'v', 'a', 'a' ]
+LEFT       => [ 'c', 't', 'v', 'a', 'a', 'z' ]
+LEFT  "c"  => [ 't', 'v', 'a', 'a', 'z' ]       "c" was removed from the board
+
+seeking "a" (closer to the right, so take from right)  [ 't', 'v', 'a', 'a', 'z' ]
+
+RIGHT      => [ 'z', 't', 'v', 'a', 'a' ]
+RIGHT "a"  => [ 'z', 't', 'v', 'a' ]            "a" was removed from the board
+
+seeking "t" (closer to the left, so take from the left)
+
+LEFT       => [ 't', 'v', 'a', 'z' ]
+LEFT  "t"  => [ 'v', 'a', 'z' ]                 "t" was removed from the board, all done!
+
+f(board, word) => moves
+
+Result: data structure
+
+LEFT:nil, LEFT:nil, LEFT:c, RIGHT:nil, RIGHT:a, LEFT:nil, LEFT:t
+
+2nd example word: "tv"
+2nd board:  [ 'a', 'z', 'c', 't', 'v', 'a' ]
+
+Result:
+
+RIGHT:nil, RIGHT:nil, RIGHT:t, LEFT:v
+
+
+1.  STRATEGY: start from the side closest to the letter, and favor left on a tie.
+2.  you only take from the left or the right
+3.  unused letters go back on the other side (rotate the board)
+4.  used letter is removed from the board
+
+*/
+func f(b []string, word string) (mv [][]string) {
+
+	var dir string
+	var x int
+
+start:
+	for _, s := range word {
+		i := indexOf(string(s), b)
+		if i > len(b)/2-1 {
+			dir = "RIGHT"
+			x = len(b) - 1
+		} else {
+			dir = "LEFT"
+			x = 0
+		}
+		for {
+			l := len(b)
+			if x < 0 || x > l {
+				break
+			}
+			lt := b[x]
+			if dir == "LEFT" {
+				b = b[x+1:]
+			} else {
+				b = b[:x]
+			}
+			if lt == string(s) {
+				mv = append(mv, []string{dir, lt})
+				continue start
+			}
+
+			mv = append(mv, []string{dir, ""})
+			if dir == "LEFT" {
+				b = append(b, lt)
+			} else {
+				b = append([]string{lt}, b...)
+			}
+
+		}
+
+	}
+
+	return mv
+}
+
+func indexOf(element string, data []string) int {
+	for k, v := range data {
+		if element == v {
+			return k
+		}
+	}
+	return -1 //not found.
 }
